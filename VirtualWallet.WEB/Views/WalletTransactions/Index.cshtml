@@ -1,0 +1,177 @@
+﻿@model IEnumerable<WalletTransactionViewModel>
+@{
+    ViewData["Title"] = "Wallet Transactions";
+    int totalCount = ViewBag.TotalCount;
+    int pageSize = ViewBag.PageSize;
+    int pageNumber = ViewBag.PageNumber;
+    int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+    var wallet1 = ViewBag.FilterParameters?.WalletId;
+
+    var routeValues = new
+    {
+        WalletId = ViewBag.FilterParameters?.WalletId,
+        TransactionDirection = ViewBag.FilterParameters?.TransactionDirection,
+        Amount = ViewBag.FilterParameters?.Amount,
+        CreatedAfter = ViewBag.FilterParameters?.CreatedAfter,
+        CreatedBefore = ViewBag.FilterParameters?.CreatedBefore,
+        SortBy = ViewBag.FilterParameters?.SortBy,
+        SortOrder = ViewBag.FilterParameters?.SortOrder,
+        Status = ViewBag.FilterParameters?.Status
+    };
+}
+
+<section class="bg-dark-1 text-white rounded p-4">
+    <div class="">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card bg-dark-3 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h4 class="mb-4">Wallet Transactions Log</h4>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Sender</th>
+                                        <th scope="col">Receiver</th>
+                                        <th scope="col">Amount*</th>
+                                        <th scope="col">Currency*</th>
+                                        <th scope="col">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null && Model.Any())
+                                    {
+                                        @foreach (var transaction in Model)
+                                        {
+                                            var recipientName = transaction.Recipient.User == null ? transaction.Sender.User.Username + "(internal)" : transaction.Recipient.User.Username;
+                                            <tr>
+                                                <td>@transaction.CreatedAt?.ToString("MMM dd, yyyy")</td>
+                                                <td>@transaction.Sender.User.Username</td>
+                                                <td>@recipientName</td>
+                                                <td>@transaction.AmountSent</td>
+                                                <td>@transaction.CurrencySent</td>
+                                                <td>@transaction.Status.ToString()</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="6" class="text-center">No transactions found.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <p>* The amount and currency are displayed based on the sender's wallet currency.</p>
+                        </div>
+                    </div>
+                </div>
+                <nav aria-label="Page navigation" class="mt-4">
+                    @PaginationHelper.GeneratePaginationLinks(Url, totalPages, pageNumber, "Index", routeValues)
+                </nav>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card bg-dark-3 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-3">Filter Transactions</h5>
+                        <form method="get" action="@Url.Action("Index", "WalletTransactions")">
+                            <div class="mb-3">
+                                <label for="WalletId" class="form-label">Select Wallet</label>
+                                <select class="form-select" id="WalletId" name="WalletId">
+                                    <option value="">All Wallets</option>
+                                    @{
+                                        bool selected = false;
+                                    }
+                                    @foreach (var wallet in ViewBag.UserWallets)
+                                    {
+                                        selected = wallet1 == wallet.Id ? true : false;
+                                        if (selected)
+                                        {
+                                            <option value="@wallet.Id" selected>@wallet.Name (@wallet.Currency)</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@wallet.Id">@wallet.Name (@wallet.Currency)</option>
+                                        }
+                                    }
+                                </select>
+
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="TransactionDirection" class="form-label">Transaction Direction</label>
+                                <select class="form-select" id="TransactionDirection" name="TransactionDirection">
+                                    <option value="all">All</option>
+                                    @{
+                                        var outgoing = ViewBag.FilterParameters?.TransactionDirection == "outgoing" ? "selected" : "";
+                                        var incomming = ViewBag.FilterParameters?.TransactionDirection == "incoming" ? "selected" : "";
+                                    }
+                                    <option value="outgoing" outgoing>Outgoing</option>
+                                    <option value="incoming" incomming>Incoming</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="Amount" class="form-label">Amount</label>
+                                <input class="form-control" type="text" placeholder="Search Amount" name="Amount" value="@ViewBag.FilterParameters?.Amount">
+                            </div>
+
+                            <div class="mb-3 row">
+                                <div class="col-md-6">
+                                    <label for="CreatedAfter" class="form-label">Created After</label>
+                                    <input type="date" class="form-control" id="CreatedAfter" name="CreatedAfter" value="@ViewBag.FilterParameters?.CreatedAfter?.ToString("yyyy-MM-dd")" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="CreatedBefore" class="form-label">Created Before</label>
+                                    <input type="date" class="form-control" id="CreatedBefore" name="CreatedBefore" value="@ViewBag.FilterParameters?.CreatedBefore?.ToString("yyyy-MM-dd")" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="Status" class="form-label">Status</label>
+                                <select class="form-select" id="Status" name="Status">
+                                    <option value="">All</option>
+                                    @{
+                                        bool selected2 = false;
+                                    }
+                                    @foreach (TransactionStatus status in Enum.GetValues(typeof(TransactionStatus)))
+                                    {
+
+                                        selected2 = ViewBag.FilterParameters?.Status == status ? true : false;
+                                        if (selected2)
+                                        {
+                                            <option value="@status" selected2>@status</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@status">@status</option>
+                                        }
+                                    }
+
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="SortBy" class="form-label">Sort By</label>
+                                <select class="form-select" id="SortBy" name="SortBy">
+                                    <option value="CreatedAt">Date</option>
+                                    <option value="Amount">Amount</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="SortOrder" class="form-label">Sort Order</label>
+                                <select class="form-select" id="SortOrder" name="SortOrder">
+                                    <option value="desc">Descending</option>
+                                    <option value="asc">Ascending</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-outline-success w-100">Apply Filters</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

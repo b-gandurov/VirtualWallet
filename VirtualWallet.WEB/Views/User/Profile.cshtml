@@ -1,0 +1,369 @@
+﻿@model UserViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+    var isProfileOwner = Model.Id == ViewBag.UserId;
+    var isAdmin = ViewBag.UserRole == UserRole.Admin.ToString();
+    var canViewFullProfile = isProfileOwner || isAdmin;
+    var onlyUser = Model.Id == ViewBag.UserId;
+    var viewProfileAsUser = Model.Id != ViewBag.UserId;
+    bool areFriends = Model.Contacts.Any(c => c.ContactId == ViewBag.UserId && c.Status == FriendRequestStatus.Accepted);
+    bool blocked = Model.Role == UserRole.Blocked.ToString();
+    var mainCurrency = Model.MainWallet == null ? "$" : Model.MainWallet.Currency.ToString();
+
+    decimal totalBalance = Model.TotalBalance.HasValue
+        ? decimal.Round(Model.TotalBalance.Value, 2, MidpointRounding.AwayFromZero)
+        : 0.00m;
+
+}
+
+<div class="container @(canViewFullProfile ? "" : "w-50") bg-dark-1 py-5 mt-5">
+    <div class="card-body">
+
+        <!-- Tabs for Profile Sections -->
+        <ul class="nav nav-tabs justify-content-center mb-4" id="profileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active text-uppercase" id="account-details-tab" data-bs-toggle="tab" href="#account-details" role="tab" aria-controls="account-details" aria-selected="true">Account</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link text-uppercase" id="profile-details-tab" data-bs-toggle="tab" href="#profile-details" role="tab" aria-controls="profile-details" aria-selected="false">Profile</a>
+            </li>
+            @if (@canViewFullProfile)
+            {
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link text-uppercase" id="friends-tab" data-bs-toggle="tab" href="#friends" role="tab" aria-controls="friends" aria-selected="false">Friends</a>
+                </li>
+            }
+            
+        </ul>
+
+        <!-- Tab Contents -->
+        <div class="tab-content" id="profileTabsContent">
+
+            <!-- Account Details Tab -->
+            <div class="tab-pane fade show active" id="account-details" role="tabpanel" aria-labelledby="account-details-tab">
+                <div class="@(canViewFullProfile ? "row mt-4 " : "d-flex justify-content-center ")animate__animated animate__fadeIn h-100">
+                    <!--here -->
+                    @if (canViewFullProfile)
+                    {
+                        <!-- Left Column: Total Balance and Wallets -->
+                        <div class="col-md-6 d-flex flex-column justify-content-between">
+                            <!-- Total Balance with Wallet Icon -->
+                            <div class="card bg-dark-3 text-white shadow-sm">
+                                <div class="d-flex justify-content-between">
+                                    <div class="card-body d-flex align-items-center">
+                                        <a href="@Url.Action("Wallets", "User")" style="color: white;">
+                                            <i class="bi bi-wallet2 display-3 me-3"></i>
+                                        </a>
+                                        
+                                        <div>
+                                            <h5>Total Balance</h5>
+                                            <h3>@mainCurrency @totalBalance</h3>
+                                        </div>
+                                    </div>
+                                    <div class="card-body d-flex align-items-center">
+                                        <a href="@Url.Action("Cards", "User")" style="color: white;">
+                                            <i class="bi bi-credit-card display-3 me-3"></i>
+                                        </a>
+                                        <div>
+                                            <h5>Total Cards</h5>
+                                            <h3>@Model.Cards.Count()</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Carousel for Wallets -->
+                            <div class="card bg-dark-3 text-white shadow-sm mt-3 flex-grow-1">
+                                <div class="card-body">
+                                    <h5 class="mb-3">Wallets</h5>
+                                    <div id="walletCarousel" class="carousel slide" data-bs-ride="carousel">
+                                        <div class="carousel-inner">
+                                            @if (Model.Wallets.Any())
+                                            {
+                                                for (int i = 0; i < Model.Wallets.Count; i++)
+                                                {
+                                                    var wallet = Model.Wallets.ElementAt(i);
+                                                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                                                        <div class="card text-white w-50 bg-dark-1 mx-auto">
+                                                            <div class="card-body d-flex gap-3 align-items-center justify-content-center">
+                                                                <span>@wallet.Name</span>
+                                                                <span class="badge bg-secondary">@wallet.Balance.ToString("N2") @wallet.Currency</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div class="carousel-item active">
+                                                    <div class="card bg-dark-1 text-white">
+                                                        <div class="card-body text-center">
+                                                            <span>No wallets available</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                        <a class="carousel-control-prev" href="#walletCarousel" role="button" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Previous</span>
+                                        </a>
+                                        <a class="carousel-control-next" href="#walletCarousel" role="button" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Next</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Right Column: Account Information -->
+                    <div class="col-md-6">
+                        <div class="card bg-dark-3 text-white mb-4 shadow-sm p-3 h-100">
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- Account Information -->
+                                    <div class="@(canViewFullProfile ? "col-md-6" : "")" align=@(canViewFullProfile ? " " : "center")>
+                                        <h5 class="mb-3 text-info">Account Information</h5>
+                                        <p><strong class="text-info">Username:</strong> @Model.Username</p>
+                                        @if (canViewFullProfile || areFriends)
+                                        {
+                                            <p><strong class="text-info">Email:</strong> @Model.Email</p>
+                                        }
+                                        
+                                        @if (Model.Role == UserRole.RegisteredUser.ToString())
+                                        {
+                                            <a href="@Url.Action("ResendVerificationEmail","Authentication",new{id = Model.Id})">Resend verification email.</a>
+                                        }
+                                        @{
+                                            var statusClass = blocked ? "text-danger animate__animated animate__fadeInUp animate__infinite" : "text-white";
+                                        }
+
+                                        <p>
+                                            <strong class="text-info">User Status:</strong>
+                                            <strong class="@statusClass ">@Model.Role.ToString()</strong>
+                                        </p>
+
+                                        @if (blocked)
+                                        {
+                                            <p>
+                                                If you believe this is a mistake you can contact us here:
+                                                <a href="mailto:vaultora@@gmail.com" class="text-info">vaultora@gmail.com</a>
+                                            </p>
+                                        }
+
+                                        @if (Model.VerificationStatus == UserVerificationStatus.NotVerified)
+                                        {
+                                            <a href="@Url.Action("UploadVerification","User")">Verify your account.</a>
+                                        }
+                                        @if (Model.VerificationStatus != UserVerificationStatus.Verified)
+                                        {
+                                            <p><strong class="text-info">Verification Status:</strong> @Model.VerificationStatus.ToString()</p>
+
+                                        }
+                                    </div>
+                                    <!-- Form Placeholder -->
+                                    <div class="col-md-6">
+                                        <div class="collapse" id="changeEmailForm">
+                                            @Html.Partial("_ChangeEmailPartial", new ChangeEmailViewModel { UserId = Model.Id, CurrentEmail = Model.Email })
+                                        </div>
+                                        <div class="collapse" id="changePasswordForm">
+                                            @Html.Partial("_ChangePasswordPartial", new ChangePasswordViewModel { UserId = Model.Id })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Actions -->
+                <div class="row animate__animated animate__fadeInUp mt-3">
+                    <div class="col-md-12 d-flex justify-content-center">
+                        <div class="text-center">
+                            <h4 class="mb-3">Actions</h4>
+                            @if (viewProfileAsUser)
+                            {
+                                <a href="@Url.Action("SendTo", "WalletTransactions", new { recipientId = Model.Id})" class="btn btn-success btn mb-2 me-2">+ Send Money</a>
+                                @if (@areFriends)
+                                {
+                                }
+                                @if (!areFriends)
+                                {
+                                    <form asp-controller="User" asp-action="SendFriendRequest" method="post" class="d-inline">
+                                        <input type="hidden" name="contactId" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-success btn mb-2 me-2">Add as Friend</button>
+                                    </form>
+                                }
+                                
+                            }
+                            @if (isAdmin && viewProfileAsUser)
+                            {
+                                <a href="@Url.Action("BlockUser", "User", new { userId = Model.Id })" class="btn btn-danger btn mb-2 me-2">Ban User</a>
+
+                                <a href="@Url.Action("UnblockUser", "User", new { userId = Model.Id })" class="btn btn-warning btn mb-2 me-2">Unban User</a>
+
+                            }
+                            @if (canViewFullProfile)
+                            {
+                                <div class="d-flex justify-content-center gap-1">
+                                    <div>
+                                        <button class="btn btn-light btn mb-2 me-2" type="button" data-bs-toggle="collapse" data-bs-target="#changeEmailForm" aria-expanded="true" aria-controls="changeEmailForm">
+                                            Change Email
+                                        </button>
+                                        <button class="btn btn-light btn mb-2 me-2" type="button" data-bs-toggle="collapse" data-bs-target="#changePasswordForm" aria-expanded="false" aria-controls="changePasswordForm">
+                                            Change Password
+                                        </button>
+                                    </div>
+                                    <a href="@Url.Action("DeleteAccount", "User", new { id = Model.Id })" class="btn btn-danger btn mb-2">Delete Account</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Details Tab -->
+            <div class="tab-pane fade animate__animated animate__fadeIn" id="profile-details" role="tabpanel" aria-labelledby="profile-details-tab">
+                <div class="d-flex gap-4 w-75 mx-auto">
+                    <!-- User Image -->
+                    <div class="col-md-@(canViewFullProfile ? "4" : "6") d-flex flex-column align-items-center mb-4 card bg-dark-3 text-white mb-4 shadow-sm p-3">
+                        <img src="@Model.UserProfile.PhotoUrl" alt="Profile Picture" class="img-thumbnail mb-3 shadow-lg" style="max-height: 200px; max-width: 100%;">
+                        @if (canViewFullProfile)
+                        {
+                            <a href="@Url.Action("EditProfile", "User", new { userId = Model.Id })" class="btn btn-secondary">Edit Profile</a>
+                        }
+                    </div>
+
+                    <!-- Personal Information -->
+                    <div class="col-md-@(canViewFullProfile ? "4" : "6") card bg-dark-3 text-white mb-4 shadow-sm p-3">
+                        <h4 class="mb-3 text-info">Personal Information</h4>
+                        <p><strong class="text-info">First Name:</strong> @Model.UserProfile.FirstName</p>
+                        <p><strong class ="text-info">Last Name:</strong> @Model.UserProfile.LastName</p>
+                        @if (canViewFullProfile || areFriends)
+                        {
+                            <p>
+                                <strong class="text-info">Date of Birth:</strong>
+                                @if (Model.UserProfile.DateOfBirth.HasValue)
+                                {
+                                    @Model.UserProfile.DateOfBirth.Value.ToString("MMMM dd, yyyy")
+                                }
+                                else
+                                {
+                                    @string.Empty;
+                                }
+                            </p>
+
+
+                            <p><strong class="text-info">Phone Number:</strong> @PhoneNumberHelper.FormatPhoneNumber(Model.UserProfile.PhoneNumber)</p>
+                        }
+                    </div>
+
+                    <!-- Address Details -->
+                    @if (canViewFullProfile)
+                    {
+                        <div class="col-md-4 card bg-dark-3 text-white mb-4 shadow-sm p-3">
+                            <h4 class="mb-3 text-info">Address Details</h4>
+                            <p><strong class="text-info">Street:</strong> @Model.UserProfile.Street</p>
+                            <p><strong class="text-info">City:</strong> @Model.UserProfile.City</p>
+                            <p><strong class="text-info">State:</strong> @Model.UserProfile.State</p>
+                            <p><strong class="text-info">Country:</strong> @Model.UserProfile.Country</p>
+                            <p><strong class="text-info">Postal Code:</strong> @Model.UserProfile.PostalCode</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+
+            <!-- Friends Tab -->
+            
+            <div class="tab-pane fade" id="friends" role="tabpanel" aria-labelledby="friends-tab">
+                <div class="col-md-12">
+                    <h4 class="mt-4">Friends List</h4>
+
+                    <!-- Search Form -->
+                    <form asp-controller="User" asp-action="SearchUsers" method="get" class="mb-4">
+                        <input type="hidden" name="userId" value="@Model.Id" />
+                        <div class="input-group">
+                            <input type="text" name="searchTerm" class="form-control" placeholder="Search friends by name or email..." aria-label="Search friends">
+                            <button class="btn btn-secondary" type="submit">Search</button>
+                        </div>
+                    </form>
+
+                    <!-- Friends List Table -->
+                    @if (Model.Contacts != null && Model.Contacts.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Username</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Description</th>
+                                        <th class="text-center" style="width: 350px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var contact in Model.Contacts)
+                                    {
+                                        <tr>
+                                            <td class="text-center"><a href="@Url.Action("Profile","User", new {id = contact.ContactId})">@contact.Contact.Username</a> </td>
+                                            <td class="text-center">@contact.Status.ToString()</td>
+                                            <td>
+                                                <div class="description-container d-flex justify-content-center">
+                                                    <!-- Display Mode -->
+                                                    <div class="description-form text-center position-absolute" style="display: none;">
+                                                        <form id="descriptionForm-@contact.ContactId" asp-controller="User" asp-action="UpdateFriendDescription" method="post" class="d-flex description-form" style="display: none;" onsubmit="saveDescription(event, @contact.ContactId)">
+                                                            <input type="hidden" name="contactId" value="@contact.ContactId" />
+                                                            <input type="text" name="description" value="@contact.Description" class="form-control form-control-sm" placeholder="Enter description" maxlength="30" />
+                                                            <button type="submit" class="btn btn-outline-success btn-sm ms-2">Save</button>
+                                                        </form>
+                                                    </div>
+                                                    @{
+                                                        var context = @contact.Description ?? "Click to add a description";
+                                                    }
+                                                    <span class="description-text" onclick="showEditForm(this)">
+                                                        @context
+                                                        <i class="bi bi-pencil-square small"></i>
+                                                    </span>
+                                                    
+
+                                                    
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                @if (contact.Status == FriendRequestStatus.Pending && onlyUser && contact.Sender.Id != Model.Id)
+                                                {
+                                                    <form asp-controller="User" asp-action="AcceptFriendRequest" method="post" class="d-inline">
+                                                        <input type="hidden" name="contactId" value="@contact.SenderId" />
+                                                        <button type="submit" class="btn btn-outline-success btn-sm">Accept</button>
+                                                    </form>
+                                                    <form asp-controller="User" asp-action="DenyFriendRequest" method="post" class="d-inline">
+                                                        <input type="hidden" name="contactId" value="@contact.ContactId" />
+                                                        <button type="submit" class="btn btn-outline-danger btn-sm">Deny</button>
+                                                    </form>
+                                                }
+                                                @if (contact.Status == FriendRequestStatus.Accepted && onlyUser)
+                                                {
+                                                    <a href="@Url.Action("SendTo", "WalletTransactions", new { recipientId = contact.ContactId})" class="btn btn-success btn-sm">+ Send Money</a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-center text-muted">No friends found.</p>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
