@@ -20,9 +20,9 @@ services:
       dockerfile: Dockerfile  # Use the Dockerfile from the root of the project directory
     container_name: "virtualwallet-app"
     ports:
-      - "8080:80"  # Map port 80 inside the container to port 8080 on the host
+      - "80:80"  # Use port 80 for both internal and external mapping in Azure
     depends_on:
-      - db  # Ensure the database service starts before the application
+      - db
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=db;Database=VirtualWalletDB;User ID=sa;Password=YourStrong!Passw0rd;

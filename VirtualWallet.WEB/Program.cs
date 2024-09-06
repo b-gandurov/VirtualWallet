@@ -23,6 +23,12 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ListenAnyIP(80);
 });
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(80);  // Ensure it listens on port 80
+});
+
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
