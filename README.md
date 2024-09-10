@@ -9,6 +9,19 @@ VirtualWallet is a comprehensive and secure digital wallet application designed 
 ## **Deployed with docker container on Azure**
 https://vw-10-bfg6cff5hdabacd9.northeurope-01.azurewebsites.net/
 
+You can create an account and explore the project or use one of the following accounts:
+
+```
+Username: admin  
+Password: admin  
+Role: administrator
+```
+```
+Username: harry_williams 
+Password: password 
+Role: standart user
+```
+
 ## Technology Stack
 
 -   **Backend**: ASP.NET Core
