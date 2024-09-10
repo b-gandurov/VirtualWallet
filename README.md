@@ -6,7 +6,8 @@ VirtualWallet is a comprehensive and secure digital wallet application designed 
 ### Important Note
 
 -   **Sensitive Information in appsettings**: The `appsettings.json` file contains sensitive information, such as API keys and connection strings. This data is exposed intentionally as this is a presentation project. It allows users to easily launch the project on their own. In a production environment, sensitive information should be secured using environment variables or secret management tools.
-
+## **Deployed with docker container on Azure**
+https://vw-10-bfg6cff5hdabacd9.northeurope-01.azurewebsites.net/
 
 ## Technology Stack
 
