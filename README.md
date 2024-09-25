@@ -27,12 +27,12 @@ The `appsettings.json` file contains sensitive information, such as API keys and
 
 **Wallet Management**
 
-- Users can create and manage different types of wallets, such as main wallets and savings wallets, with support for various currencies. 
-- Secure and efficient handling of transactions within and across wallets, including support for recurring payments and detailed transaction histories.
+- Users can create and manage different types of wallets, with support for various currencies. 
+- Secure and efficient handling of transactions within and across wallets with detailed transaction histories.
 
 **Card Management**
 
-- Users can add and remove cards associated with their accounts. The application supports both virtual and real cards. Verification of the cards is done by a dummy Payment Processor service.
+- Users can add and remove cards associated with their accounts. Verification of the cards is done by a dummy Payment Processor service with preset "real cards"
 - Detailed management of transactions made using associated cards, including filtering and searching capabilities. 
 
 **Payment Processing**
