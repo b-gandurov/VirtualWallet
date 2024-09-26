@@ -12,22 +12,8 @@ using VirtualWallet.DATA.Context;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using System.Reflection;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using Twilio.Jwt.Taskrouter;
-using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(80);
-});
-
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(80);  // Ensure it listens on port 80
-});
-
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -39,17 +25,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString);
 
     options.EnableSensitiveDataLogging();
-});
-
-var retryPolicy = Polly.Policy
-    .Handle<SqlException>()
-    .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-
-retryPolicy.Execute(() =>
-{
-    // Attempt database connection or migration
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 });
 
 //Google Oauth
@@ -161,9 +136,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 
-try
-{
-    var app = builder.Build();
+var app = builder.Build();
 
 // Data Seeding
 using (var scope = app.Services.CreateScope())
@@ -210,10 +183,4 @@ app.UseEndpoints(endpoints =>
         defaults: new { controller = "Error", action = "Index" });
 });
 
-
 app.Run();
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"An error occurred: {ex.Message}");
-}
