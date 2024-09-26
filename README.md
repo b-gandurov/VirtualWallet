@@ -18,17 +18,17 @@ The `appsettings.json` file contains sensitive information, such as API keys and
 
 ## **Features**
 
-**User Authentication and Authorization**
+**User Authentication and Authorization** - [Video example](https://www.canva.com/design/DAGRs31MKvg/2kisS3Pk2l0DWWckVRkIow/watch?utm_content=DAGRs31MKvg&utm_campaign=share_your_design&utm_medium=link&utm_source=shareyourdesignpanel)
+
 - Secure login and registration functionalities with `JWT (JSON Web Tokens)` to manage user sessions. Integration with `Google OAuth` for streamlined third-party authentication.
 - Role-based access control ensures that users can only access features and data relevant to their role (e.g., Admin, Registered User).
 
-[Video example](https://www.canva.com/design/DAGRs31MKvg/2kisS3Pk2l0DWWckVRkIow/watch?utm_content=DAGRs31MKvg&utm_campaign=share_your_design&utm_medium=link&utm_source=shareyourdesignpanel)
 
 
-**Wallet Management**
+**Wallet Management** 
 
-- Users can create and manage different types of wallets, with support for various currencies. 
-- Secure and efficient handling of transactions within and across wallets with detailed transaction histories.
+- Users can create and manage different types of wallets, with support for various currencies. - [Video example](https://www.canva.com/design/DAGR2tHhh60/xfQSh403VuAp8zd3fcHHiQ/watch?utm_content=DAGR2tHhh60&utm_campaign=designshare&utm_medium=link&utm_source=editor)
+- Secure and efficient handling of transactions within and across wallets with detailed transaction histories. - [Video example](https://www.canva.com/design/DAGR2kdkD48/V7RPOyi6qzEPorL7Vv8itQ/watch?utm_content=DAGR2kdkD48&utm_campaign=designshare&utm_medium=link&utm_source=editor)
 
 **Card Management**
 
@@ -50,12 +50,13 @@ The `appsettings.json` file contains sensitive information, such as API keys and
 	* Uses BeginTransactionAsync to ensure transaction integrity.
 	* Rolls back and refunds to the wallet if the transaction fails.
 
-- Wallet to Wallet Transactions
+- Wallet to Wallet Transactions 
 	* Initiates the transfer, including currency conversion if needed.
 	* Completes the transfer after recipient verification.
 	* Uses BeginTransactionAsync for both steps.
 	* Sends verification and confirmation emails to users.
-	
+
+		
 - Error Handling
 	* Automatically rolls back and refunds to the original payment source if issues arise during the transaction process.
 	* Payment Integration: Integration with external payment processors to handle real card transactions securely. This includes deposit and withdrawal operations with proper validation.
