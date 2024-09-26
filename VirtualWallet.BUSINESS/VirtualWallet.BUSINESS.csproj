@@ -7,6 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\EmailTemplates\PasswordResetTemplate.html" />
+    <None Remove="Resources\EmailTemplates\PaymentVerificationEmailTemplate.html" />
+    <None Remove="Resources\EmailTemplates\VerificationEmailTemplate.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\EmailTemplates\PasswordResetTemplate.html" />
+    <EmbeddedResource Include="Resources\EmailTemplates\PaymentVerificationEmailTemplate.html" />
+    <EmbeddedResource Include="Resources\EmailTemplates\VerificationEmailTemplate.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\VirtualWallet.DATA\VirtualWallet.DATA.csproj" />
   </ItemGroup>
 

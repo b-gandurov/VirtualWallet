@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
@@ -45,62 +46,86 @@ public class SmtpEmailService : IEmailService
 
     public async Task<Result> SendVerificationEmailAsync(User user, string verificationLink)
     {
-        string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "VirtualWallet.BUSINESS", "Resources", "EmailTemplates", "VerificationEmailTemplate.html");
+        var assembly = Assembly.GetExecutingAssembly();
 
-        if (!File.Exists(templatePath))
+        var resourceName = "VirtualWallet.BUSINESS.Resources.EmailTemplates.VerificationEmailTemplate.html";
+
+        using (Stream stream = assembly.GetManifestResourceStream(resourceName))
         {
-            return Result.Failure("Email template not found.");
+            if (stream == null)
+            {
+                return Result.Failure("Email template not found.");
+            }
+
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                string emailTemplate = await reader.ReadToEndAsync();
+
+                string emailContent = emailTemplate.Replace("{{Username}}", user.Username)
+                                                   .Replace("{{VerificationLink}}", verificationLink);
+
+                await SendEmailAsync(user.Email, "Email Verification", emailContent);
+            }
         }
 
-        string emailTemplate = await File.ReadAllTextAsync(templatePath);
-
-        string emailContent = emailTemplate.Replace("{{Username}}", user.Username)
-                                           .Replace("{{VerificationLink}}", verificationLink);
-
-        await SendEmailAsync(user.Email, "Email Verification", emailContent);
-
         return Result.Success();
-
     }
+
 
     public async Task<Result> SendPasswordResetEmailAsync(User user, string resetLink)
     {
-        string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "VirtualWallet.BUSINESS", "Resources", "EmailTemplates", "PasswordResetTemplate.html");
+        var assembly = Assembly.GetExecutingAssembly();
 
-        if (!File.Exists(templatePath))
+        var resourceName = "VirtualWallet.BUSINESS.Resources.EmailTemplates.PasswordResetTemplate.html";
+
+        using (Stream stream = assembly.GetManifestResourceStream(resourceName))
         {
-            return Result.Failure("Email template not found.");
+            if (stream == null)
+            {
+                return Result.Failure("Email template not found.");
+            }
+
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                string emailTemplate = await reader.ReadToEndAsync();
+
+                string emailContent = emailTemplate.Replace("{{Username}}", user.Username)
+                                                   .Replace("{{ResetLink}}", resetLink);
+
+                await SendEmailAsync(user.Email, "Password Reset", emailContent);
+            }
         }
-
-        string emailTemplate = await File.ReadAllTextAsync(templatePath);
-
-        string emailContent = emailTemplate.Replace("{{Username}}", user.Username)
-                                           .Replace("{{ResetLink}}", resetLink);
-
-        await SendEmailAsync(user.Email, "Password Reset", emailContent);
 
         return Result.Success();
     }
 
     public async Task<Result> SendPaymentVerificationEmailAsync(User user, string verificationCode)
     {
-        string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "VirtualWallet.BUSINESS", "Resources", "EmailTemplates", "PaymentVerificationEmailTemplate.html");
+        var assembly = Assembly.GetExecutingAssembly();
 
-        if (!File.Exists(templatePath))
+        var resourceName = "VirtualWallet.BUSINESS.Resources.EmailTemplates.PaymentVerificationEmailTemplate.html";
+
+        using (Stream stream = assembly.GetManifestResourceStream(resourceName))
         {
-            return Result.Failure("Email template not found.");
+            if (stream == null)
+            {
+                return Result.Failure("Email template not found.");
+            }
+
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                string emailTemplate = await reader.ReadToEndAsync();
+
+                string emailContent = emailTemplate.Replace("{{Username}}", user.Username)
+                                                   .Replace("{{Generate}}", verificationCode);
+
+                await SendEmailAsync(user.Email, "Payment Code", emailContent);
+            }
         }
 
-        string emailTemplate = await File.ReadAllTextAsync(templatePath);
-
-        string emailContent = emailTemplate.Replace("{{Username}}", user.Username)
-                                           .Replace("{{Generate}}", verificationCode);
-
-        await SendEmailAsync(user.Email, "Payment Code", emailContent);
-
         return Result.Success();
-
     }
+
 
 
 }

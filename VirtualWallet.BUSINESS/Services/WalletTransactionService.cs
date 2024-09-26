@@ -79,8 +79,8 @@ namespace VirtualWallet.DATA.Services
 
             WalletTransaction transaction = new WalletTransaction
             {
-                AmountSent = sentAmount.Value,
-                AmountReceived = amount,
+                AmountSent = amount,
+                AmountReceived = sentAmount.Value,
                 Recipient = recipientWallet,
                 Sender = senderWallet,
                 VerificationCode = verificationCode,
@@ -109,6 +109,7 @@ namespace VirtualWallet.DATA.Services
             var receiver = await _walletRepository.GetWalletByIdAsync(transaction.RecipientId);
             transaction.Sender = sender;
             transaction.Recipient = receiver;
+            (transaction.AmountReceived, transaction.AmountSent) = (transaction.AmountSent, transaction.AmountReceived);
             var completedTransacctions = await _transactionHandlingService.ProcessWalletToWalletTransactionAsync(transaction);
             if (!completedTransacctions.IsSuccess)
             {
@@ -137,8 +138,8 @@ namespace VirtualWallet.DATA.Services
 
             WalletTransaction transaction = new WalletTransaction
             {
-                AmountSent = sentAmount.Value,
-                AmountReceived = amount,
+                AmountSent = amount,
+                AmountReceived = sentAmount.Value,
                 Recipient = receiverWallet,
                 Sender = senderWallet,
                 VerificationCode = verificationCode,
