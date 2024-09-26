@@ -177,7 +177,7 @@ namespace VirtualWallet.DATA.Services
             foreach (var transaction in transactions)
             {
                 var recepientUser = await _userService.GetUserByIdAsync(transaction.Recipient.UserId);
-                var senderUser = await _userService.GetUserByIdAsync(transaction.Recipient.UserId);
+                var senderUser = await _userService.GetUserByIdAsync(transaction.Sender.UserId);
                 transaction.Recipient.User = recepientUser.Value;
                 transaction.Sender.User = senderUser.Value;
             }
