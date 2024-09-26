@@ -1,32 +1,39 @@
-version: '3.8'
-
 services:
-  # SQL Server Database Service
+  # PostgreSQL Database Service
   db:
-    image: "mcr.microsoft.com/mssql/server:2019-latest"
-    container_name: "sqlserver-db"
+    image: "postgres:13"
+    container_name: "postgres-db"
     environment:
-      - SA_PASSWORD=YourStrong!Passw0rd
-      - ACCEPT_EULA=Y
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: YourStrong!Passw0rd
+      POSTGRES_DB: VirtualWalletDB
     ports:
-      - "1433:1433"  # Exposing SQL Server on the default port
+      - "5432:5432"
     volumes:
-      - sqlvolume:/var/opt/mssql  # Persist database data on the host system
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
 
   # Application Service
   app:
     build:
       context: .
-      dockerfile: Dockerfile  # Use the Dockerfile from the root of the project directory
+      dockerfile: Dockerfile
     container_name: "virtualwallet-app"
     ports:
-      - "80:80"  # Use port 80 for both internal and external mapping in Azure
+      - "80:80"
     depends_on:
       - db
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=db;Database=VirtualWalletDB;User ID=sa;Password=YourStrong!Passw0rd;
+      - ConnectionStrings__DefaultConnection=Host=db;Database=VirtualWalletDB;Username=postgres;Password=YourStrong!Passw0rd
+    networks:
+      - app-network
 
 volumes:
-  sqlvolume:
-    driver: local  # Persist database data using a local volume
+  pgdata:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

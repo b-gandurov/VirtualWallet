@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VirtualWallet.DATA.Models;
+using System.Linq; // Include this for LINQ methods
 
 public class ApplicationDbContext : DbContext
 {
@@ -79,7 +80,6 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(uc => uc.ContactId)
             .OnDelete(DeleteBehavior.Restrict);
 
-
         modelBuilder.Entity<WalletTransaction>()
             .HasOne(wt => wt.Sender)
             .WithMany(w => w.SentTransactions)
@@ -120,7 +120,6 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(uw => uw.WalletId)
             .OnDelete(DeleteBehavior.Restrict);
 
-
         // Precision and Scale for Decimal
         modelBuilder.Entity<CardTransaction>()
             .Property(ct => ct.Amount)
@@ -146,8 +145,18 @@ public class ApplicationDbContext : DbContext
             .Property(wt => wt.AmountSent)
             .HasColumnType("decimal(18,2)");
 
+        // Map DateTime properties to 'timestamp with time zone'
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var properties = entityType.GetProperties()
+                .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?));
+
+            foreach (var property in properties)
+            {
+                property.SetColumnType("timestamp with time zone");
+            }
+        }
+
         base.OnModelCreating(modelBuilder);
     }
-
-
 }

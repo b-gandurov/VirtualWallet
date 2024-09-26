@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # SQL Server Database Service
+  db:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    container_name: "sqlserver-db"
+    environment:
+      - SA_PASSWORD=YourStrong!Passw0rd
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlvolume:/var/opt/mssql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "YourStrong!Passw0rd", "-Q", "SELECT 1"]
+      interval: 10s
+      retries: 10
+      start_period: 30s
+
+  # Application Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: "virtualwallet-app"
+    ports:
+      - "80:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=VirtualWalletDB;User ID=sa;Password=YourStrong!Passw0rd;
+    networks:
+      - app-network
+
+volumes:
+  sqlvolume:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

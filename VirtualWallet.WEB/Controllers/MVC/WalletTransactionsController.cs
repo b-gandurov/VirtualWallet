@@ -100,7 +100,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
             }
             var resultDeposit = await _walletTransactionService.ProcessSendAmountAsync(_viewModelMapper.ToWalletTransaction(transaction));
 
-            //TODO CHECK RESULT
             if (!resultDeposit.IsSuccess)
             {
                 TempData["ErrorMessage"] = resultDeposit.Error;

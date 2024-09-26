@@ -143,8 +143,8 @@ namespace VirtualWallet.BUSINESS.Services
             try
             {
 
-                transactionToProcess.Sender.Balance -= transactionToProcess.AmountSent;
-                transactionToProcess.Recipient.Balance += transactionToProcess.AmountReceived;
+                transactionToProcess.Sender.Balance -= transactionToProcess.AmountReceived;
+                transactionToProcess.Recipient.Balance += transactionToProcess.AmountSent;
                 await _walletRepository.UpdateWalletAsync(transactionToProcess.Sender);
                 await _walletRepository.UpdateWalletAsync(transactionToProcess.Recipient);
 

@@ -283,9 +283,7 @@ namespace VirtualWallet.DATA.Context
 
             }
 
-
         }
-
 
         private static string GenerateUsername(string firstName, string lastName, DateTime dateOfBirth, int num)
         {
