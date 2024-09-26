@@ -5,8 +5,7 @@
 VirtualWallet is a comprehensive and secure digital wallet application designed to facilitate easy and efficient financial transactions. The application is built using ASP.NET Core, providing a robust backend system with a focus on scalability, security, and ease of use. Users can manage their finances, execute transactions, and interact with various financial services seamlessly through the platform.
 ### Important Note
 
--   **Sensitive Information in appsettings**: The `appsettings.json` file contains sensitive information, such as API keys and connection strings. This data is exposed intentionally as this is a presentation project. It allows users to easily launch the project on their own. In a production environment, sensitive information should be secured using environment variables or secret management tools.
-
+The `appsettings.json` file contains sensitive information, such as API keys and connection strings. This data is exposed intentionally as this is a presentation project. It allows users to easily launch the project on their own. In a production environment, sensitive information should be secured using environment variables or secret management tools.
 
 ## Technology Stack
 
@@ -20,17 +19,20 @@ VirtualWallet is a comprehensive and secure digital wallet application designed 
 ## **Features**
 
 **User Authentication and Authorization**
- - Secure login and registration functionalities with `JWT (JSON Web Tokens)` to manage user sessions. Integration with `Google OAuth` for streamlined third-party authentication.
+- Secure login and registration functionalities with `JWT (JSON Web Tokens)` to manage user sessions. Integration with `Google OAuth` for streamlined third-party authentication.
 - Role-based access control ensures that users can only access features and data relevant to their role (e.g., Admin, Registered User).
+
+[Video example](https://www.canva.com/design/DAGRs31MKvg/2kisS3Pk2l0DWWckVRkIow/watch?utm_content=DAGRs31MKvg&utm_campaign=share_your_design&utm_medium=link&utm_source=shareyourdesignpanel)
+
 
 **Wallet Management**
 
-- Users can create and manage different types of wallets, such as main wallets and savings wallets, with support for various currencies. 
-- Secure and efficient handling of transactions within and across wallets, including support for recurring payments and detailed transaction histories.
+- Users can create and manage different types of wallets, with support for various currencies. 
+- Secure and efficient handling of transactions within and across wallets with detailed transaction histories.
 
 **Card Management**
 
-- Users can add and remove cards associated with their accounts. The application supports both virtual and real cards. Verification of the cards is done by a dummy Payment Processor service.
+- Users can add and remove cards associated with their accounts. Verification of the cards is done by a dummy Payment Processor service with preset "real cards"
 - Detailed management of transactions made using associated cards, including filtering and searching capabilities. 
 
 **Payment Processing**
